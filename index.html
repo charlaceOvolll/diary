@@ -338,8 +338,8 @@ textarea::placeholder{color:var(--t3)}
 <label class="pav2" id="pAv2" for="ai">🌿</label>
 <div class="avside"><button class="pedsm" data-ava>🖼 更换头像</button><div class="avhint">从手机相册选一张图</div></div>
 </div>
-<div class="fld" style="margin-top:16px"><label>缓存</label>
-<div class="avrow" style="margin-top:8px"><div class="icoPrev">🧹</div><div class="avside"><button class="pedsm" id="cacheClr">🗑 清空缓存</button><div class="avhint">清除网页缓存文件，不会动你的日记。打开还是旧版时点这里。</div></div></div>
+<div class="fld" style="margin-top:16px"><label>数据</label>
+<div class="avrow" style="margin-top:8px"><div class="icoPrev">🗑</div><div class="avside"><button class="pedsm" id="cacheClr">🗑 清除所有数据</button><div class="avhint">删除全部日记、评论、文件夹和头像，不可恢复。建议先导出备份。</div></div></div>
 </div>
 <div class="fld" style="margin-top:14px"><label>名称</label><input id="pfn" maxlength="20"></div>
 <div class="fld" style="margin-top:12px"><label>@ID</label><input id="pfh" maxlength="20"></div>
@@ -1284,11 +1284,12 @@ return;
 }
 if(q('[data-ava]')){$('#ai').click();return}
 if(q('#cacheClr')){
-ask('确定清空缓存？只清网页文件，你的日记不受影响，清完会自动重新加载。',function(){
+ask('确定清除所有数据？会删掉全部日记、评论、文件夹和头像，无法恢复。建议先到「我的」导出备份。清完页面会自动刷新成空白状态。',function(){
+try{localStorage.setItem(DK,'[]');localStorage.setItem(FK,'null');localStorage.setItem(PK,'null')}catch(e){}
+try{if(window.indexedDB){var o=indexedDB.open(IDB,1);o.onupgradeneeded=function(e){var db=e.target.result;if(!db.objectStoreNames.contains('kv'))db.createObjectStore('kv')};o.onsuccess=function(){var db=o.result;try{var tx=db.transaction('kv','readwrite');tx.objectStore('kv').put({d:[],f:[],p:{}},'main');tx.oncomplete=function(){db.close()}}catch(e){db.close()}}}}catch(e){}
 try{if(window.caches&&caches.keys)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}catch(e){}
-try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})}).catch(function(){})}catch(e){}
-ts('缓存已清空，正在重新加载…');
-setTimeout(function(){location.href=location.pathname+'?v='+Date.now()},900);
+ts('数据已清除，正在重新加载…');
+setTimeout(function(){location.href=location.pathname+'?v='+Date.now()},1200);
 });
 return;
 }
