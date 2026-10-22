@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="日记">
-<meta name="app-ver" content="33">
+<meta name="app-ver" content="34">
 <title>日记</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" id="favIcon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='52'%3E%F0%9F%93%93%3C/text%3E%3C/svg%3E">
@@ -335,11 +335,11 @@ textarea::placeholder{color:var(--t3)}
 <div class="mod" id="pM2"><div class="sh">
 <div class="shd"><b>编辑资料</b><button class="x">✕</button></div>
 <div class="avrow">
-<label class="pav2" id="pAv2" for="ai">🌿<span class="cam">📷</span></label>
-<div class="avside"><button class="pedsm" data-avurl>🔗 用网址换头像</button><div class="avhint">点头像可上传本地图片</div></div>
+<label class="pav2" id="pAv2" for="ai">🌿</label>
+<div class="avside"><button class="pedsm" data-ava>🖼 更换头像</button><div class="avhint">从手机相册选一张图</div></div>
 </div>
-<div class="fld" style="margin-top:16px"><label>网页图标（浏览器标签上显示）</label>
-<div class="avrow" style="margin-top:8px"><div class="icoPrev" id="icoPrev">📓</div><div class="avside"><button class="pedsm" id="icoPick">🖼 选择图片</button><div class="avhint">桌面上的 App 图标由文件 icon-512.png 决定，不是在页面里设置</div></div></div>
+<div class="fld" style="margin-top:16px"><label>缓存</label>
+<div class="avrow" style="margin-top:8px"><div class="icoPrev">🧹</div><div class="avside"><button class="pedsm" id="cacheClr">🗑 清空缓存</button><div class="avhint">清除网页缓存文件，不会动你的日记。打开还是旧版时点这里。</div></div></div>
 </div>
 <div class="fld" style="margin-top:14px"><label>名称</label><input id="pfn" maxlength="20"></div>
 <div class="fld" style="margin-top:12px"><label>@ID</label><input id="pfh" maxlength="20"></div>
@@ -826,7 +826,7 @@ return'<div class="fc" data-fid="'+f.id+'"><button class="fed" data-fe="'+f.id+'
 function avaShow(){
 var h=S.p.av?'<img src="'+S.p.av+'" alt="">':'🌿';
 $('#pAv').innerHTML=h;
-$('#pAv2').innerHTML=h+'<span class="cam">📷</span>';
+$('#pAv2').innerHTML=h;
 }
 function setAva(v){S.p.av=v;svAll();avaShow();rAll();if(S.dvId)dvRender();ts('头像已更新')}
 function rMe(){
@@ -1282,7 +1282,16 @@ if(dfd){dfd.prompt();dfd.userChoice.then(function(){dfd=null;var b=$('#installBt
 else ts('请在浏览器菜单里选择「安装应用」');
 return;
 }
-if(q('#icoPick')){$('#icoImg').click();return}
+if(q('[data-ava]')){$('#ai').click();return}
+if(q('#cacheClr')){
+ask('确定清空缓存？只清网页文件，你的日记不受影响，清完会自动重新加载。',function(){
+try{if(window.caches&&caches.keys)caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})})}catch(e){}
+try{if(navigator.serviceWorker&&navigator.serviceWorker.getRegistrations)navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})}).catch(function(){})}catch(e){}
+ts('缓存已清空，正在重新加载…');
+setTimeout(function(){location.href=location.pathname+'?v='+Date.now()},900);
+});
+return;
+}
 if(q('#moreBtn')){S.limit=(S.limit||PAGE)+PAGE;rAll();return}
 if(q('#flBtn')){flOpen();return}
 var flm=q('#flMode button');
@@ -1296,7 +1305,6 @@ if(dab){dvPane(dab.dataset.dact==='c'?'c':'r');return}
 var rpB=q('[data-rep]');
 if(rpB){openDiary(rpB.dataset.rep);return}
 if(q('[data-urlimg]')){uPop('输入图片网址',function(u){u2d(u,function(dt){if(!dt){ts('无法读取该图片（可能有跨域限制）');return}if(S.tts.length>=4){ts('最多4张');return}S.tts.push(dt);rth();ts('已添加网址图片')})});return}
-if(q('[data-avurl]')){uPop('输入头像图片网址',function(u){u2d(u,function(dt){if(!dt){ts('无法读取，换张图试试');return}setAva(dt)})});return}
 var cip=q('[data-cimgpick]');
 if(cip){S.imgTarget=cip.dataset.cimgpick;$('#cmImg').click();return}
 var cir=q('[data-cimgrm]');
