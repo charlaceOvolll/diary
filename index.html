@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="日记">
-<meta name="app-ver" content="34">
+<meta name="app-ver" content="35">
 <title>日记</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" id="favIcon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='52'%3E%F0%9F%93%93%3C/text%3E%3C/svg%3E">
@@ -242,11 +242,12 @@ textarea::placeholder{color:var(--t3)}
 .athint-b{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
 .athint-b button{font-size:13px;font-weight:700;padding:7px 14px;border-radius:14px}
 #atOk{background:var(--ac);color:#fff}#atNo{background:#f0f0f2;color:var(--t2)}
+#pM .sh.full{height:100%;max-height:100%;border-radius:0;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}#pM .sh.full textarea{min-height:42vh;font-size:16px}
 </style>
 </head>
 <body>
 <div id="app">
-<header class="top"><div class="brand">📓 日记</div><button class="today" id="ckBtn">检查更新</button></header>
+<header class="top"><div class="brand">📔 日记</div><button class="today" id="ckBtn">检查更新</button></header>
 <section id="tab-feed"><div class="fbar"></div><div class="sec"><div class="shh"><span>时间线</span></div><div id="fd"></div></div></section>
 <section id="tab-cal" class="hide"><div class="fbar"></div>
 <div class="vs" id="vs"><button data-v="week">周</button><button data-v="month" class="on">月</button><button data-v="year">年</button></div>
@@ -282,7 +283,7 @@ textarea::placeholder{color:var(--t3)}
 <div class="dvin2"><div class="cimgrow" id="dviThb"></div><div class="dvin2b"><button class="cimg" data-cimgpick="c">🖼</button><input id="dvi" placeholder="写下你的评论…" maxlength="200"><button id="dvs">发送</button></div></div>
 </div></div>
 <div class="mod" id="pM"><div class="sh">
-<div class="shd"><b id="pTi">新日记</b><button class="x">✕</button></div>
+<div class="shd"><b id="pTi">新日记</b><div style="display:flex;gap:8px"><button class="x" id="pExpand">⬆</button><button class="x">✕</button></div></div>
 <textarea id="pc" placeholder="此刻在想些什么…"></textarea>
 <div class="th2" id="thb"></div><div id="muRow"></div><div id="loRow"></div><div class="frow" id="fPick"></div>
 <div class="tr2"><div class="fld"><label>日期</label><input type="date" id="pd"></div><div class="fld"><label>时间</label><select id="tmode"><option value="clock">时刻</option><option value="per">大概</option></select><input type="time" id="ptm"><select id="ptp"><option>夜</option><option>晨</option><option>早</option><option>上</option><option>午</option><option>下</option><option>晚</option></select></div></div>
@@ -685,7 +686,7 @@ var actA=detail?'data-dact':'data-act';
 return'<div class="'+(cls||'post')+'" data-id="'+d.id+'"><div class="av">'+av+'</div><div class="pm">'+
 '<div class="mt2"><span class="pa">'+eh(S.p.name)+'</span><span class="ph">'+eh(S.p.handle)+'</span><span class="pt">· '+tstr(d)+'</span></div>'+
 '<div class="px">'+(kw?hl(d.text,kw):eh(d.text))+'</div>'+
-(detail?qBars(d):qOrig(d))+qPubs(d)+bits(d)+
+(detail?qBars(d):qOrig(d))+(detail?'':qPubs(d))+bits(d)+
 '<div class="pac">'+
 '<button class="ab" '+actA+'="c" data-id="'+d.id+'">'+icC()+'<span class="n">'+(d.comments||[]).length+'</span></button>'+
 '<button class="ab" '+actA+'="r" data-id="'+d.id+'">'+icR()+'<span class="n">'+rc+'</span></button>'+
@@ -910,6 +911,8 @@ if($(mode).value==='per'){$(per).classList.remove('hide');$(clk).classList.add('
 else{$(clk).classList.remove('hide');$(per).classList.add('hide')}
 }
 function oP(id,pre){
+var sho=$('#pM .sh');if(sho)sho.classList.remove('full');
+var pe=$('#pExpand');if(pe)pe.textContent='⬆';
 S.ed=id||null;
 var d=id?D(id):null,n=new Date();
 S.tf=d&&d.folders?d.folders.slice():[];
@@ -1283,6 +1286,13 @@ else ts('请在浏览器菜单里选择「安装应用」');
 return;
 }
 if(q('[data-ava]')){$('#ai').click();return}
+if(q('#pExpand')){
+var shEl=$('#pM .sh');
+if(shEl)shEl.classList.toggle('full');
+var peb=$('#pExpand');
+if(peb)peb.textContent=(shEl&&shEl.classList.contains('full'))?'⬇':'⬆';
+return;
+}
 if(q('#cacheClr')){
 ask('确定清除所有数据？会删掉全部日记、评论、文件夹和头像，无法恢复。建议先到「我的」导出备份。清完页面会自动刷新成空白状态。',function(){
 try{localStorage.setItem(DK,'[]');localStorage.setItem(FK,'null');localStorage.setItem(PK,'null')}catch(e){}
