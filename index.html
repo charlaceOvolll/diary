@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="日记">
-<meta name="app-ver" content="35">
+<meta name="app-ver" content="36">
 <title>日记</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" id="favIcon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='52'%3E%F0%9F%93%93%3C/text%3E%3C/svg%3E">
@@ -243,6 +243,7 @@ textarea::placeholder{color:var(--t3)}
 .athint-b button{font-size:13px;font-weight:700;padding:7px 14px;border-radius:14px}
 #atOk{background:var(--ac);color:#fff}#atNo{background:#f0f0f2;color:var(--t2)}
 #pM .sh.full{height:100%;max-height:100%;border-radius:0;padding-bottom:calc(18px + env(safe-area-inset-bottom,0px))}#pM .sh.full textarea{min-height:42vh;font-size:16px}
+.ps{gap:8px}.ps div{min-width:32px}
 </style>
 </head>
 <body>
@@ -258,7 +259,7 @@ textarea::placeholder{color:var(--t3)}
 <section id="tab-search" class="hide"><div class="sb"><input id="si" placeholder="搜索日记或评论…"></div><div id="sres"></div></section>
 <section id="tab-me" class="hide">
 <div class="phd"><div class="pav" id="pAv">🌿</div><div class="pi"><div class="pn" id="pNm"></div><div class="phl" id="pHd"></div></div><button class="ped" id="eP">编辑资料</button></div>
-<div class="ps"><div><b id="stD">0</b><span>日记</span></div><div><b id="stC">0</b><span>评论</span></div><div><b id="stR">0</b><span>转发</span></div><div><b id="stF">0</b><span>文件夹</span></div><div><b id="stI">0</b><span>图片</span></div></div>
+<div class="ps"><div><b id="stD">0</b><span>日记</span></div><div><b id="stC">0</b><span>评论</span></div><div><b id="stR">0</b><span>转发</span></div><div><b id="stF">0</b><span>文件夹</span></div><div><b id="stI">0</b><span>图片</span></div><div><b id="stM">0</b><span>音乐</span></div><div><b id="stL">0</b><span>定位</span></div></div>
 <div class="stbox">
 <div class="stl">存储空间：<b id="stUs">读取中…</b></div>
 <div class="stbar"><i id="stFill" style="width:0%"></i></div>
@@ -451,7 +452,7 @@ var DK='tdiary_v11',FK='tdfold_v11',PK='tdpro_v2',IDB='diary_db_main';
 var PT={夜:'00:00',晨:'03:00',早:'06:00',上:'09:00',午:'12:00',下:'15:00',晚:'20:00'};
 var PERS=['夜','晨','早','上','午','下','晚'];
 var PAGE=120;
-var VFN={cmt:'有评论的日记',rep:'转发的日记',img:'有图片的日记'};
+var VFN={cmt:'有评论的日记',rep:'转发的日记',img:'有图片的日记',mus:'有音乐的日记',loc:'有定位的日记'};
 function defF(){return[{id:'f1',n:'生活',e:'📓'},{id:'f2',n:'工作',e:'💼'},{id:'f3',n:'旅行',e:'✈️'},{id:'f4',n:'美食',e:'🍽'},{id:'f5',n:'灵感',e:'💡'}]}
 function defP(){return{name:'我的日记',handle:'@mydiary',av:'',ico:''}}
 function seed(){var n=Date.now();function mk(o,t,tx,fs,cs,mu,lo){return{id:'s'+Math.abs(o)+t.replace(':',''),date:fd(new Date(Date.now()+o*864e5)),time:t,per:null,sq:tmin(t),text:tx,folders:fs||[],imgs:[],music:mu||null,loc:lo||null,rep:null,via:null,p:null,comments:cs||[],ts:n+o*864e5}}return[
@@ -606,6 +607,8 @@ if(!S.vf)return true;
 if(S.vf==='cmt')return (d.comments||[]).length>0;
 if(S.vf==='rep')return !!(d.p||d.via||d.rep);
 if(S.vf==='img'){if(d.imgs&&d.imgs.length)return true;return (d.comments||[]).some(function(c){return c.imgs&&c.imgs.length>0})}
+if(S.vf==='mus')return !!d.music;
+if(S.vf==='loc')return !!d.loc;
 return true;
 }
 function ff(l){
@@ -841,6 +844,10 @@ $('#stF').textContent=S.f.length;
 var ic=0;
 S.d.forEach(function(x){ic+=(x.imgs||[]).length;(x.comments||[]).forEach(function(c){ic+=(c.imgs||[]).length})});
 $('#stI').textContent=ic;
+var mc=0,lc=0;
+S.d.forEach(function(x){if(x.music)mc++;if(x.loc)lc++});
+$('#stM').textContent=mc;
+$('#stL').textContent=lc;
 rFG();stShow();
 }
 function tab(t){
@@ -1276,6 +1283,8 @@ if(pk==='stD'){S.vf=null;S.afid=null;S.limit=PAGE;tab('feed');window.scrollTo(0,
 if(pk==='stC'){S.vf='cmt';S.afid=null;S.limit=PAGE;tab('feed');window.scrollTo(0,0);return}
 if(pk==='stR'){S.vf='rep';S.afid=null;S.limit=PAGE;tab('feed');window.scrollTo(0,0);return}
 if(pk==='stI'){S.vf='img';S.afid=null;S.limit=PAGE;tab('feed');window.scrollTo(0,0);return}
+if(pk==='stM'){S.vf='mus';S.afid=null;S.limit=PAGE;tab('feed');window.scrollTo(0,0);return}
+if(pk==='stL'){S.vf='loc';S.afid=null;S.limit=PAGE;tab('feed');window.scrollTo(0,0);return}
 if(pk==='stF'){var fgE=$('#fg');if(fgE&&fgE.scrollIntoView)fgE.scrollIntoView({behavior:'smooth',block:'center'});return}
 return;
 }
